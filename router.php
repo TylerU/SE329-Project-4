@@ -42,6 +42,10 @@ if(isset($_GET['function'])){
 		User::viewLoanHistory($userName, $exact);
 		return;
 	}
+	if($function == 'viewLates'){
+		User::viewLateRentals();
+		return;
+	}
 	if($function == 'viewCheckOut'){
 		$userName = $_GET['userID'];
 		User::viewCheckedOutBook($userName);

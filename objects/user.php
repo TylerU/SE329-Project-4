@@ -58,6 +58,17 @@ class User
 			echo "<TR><TD><B>".$row['Copyid']."<B></TD><TD>".$row['Username']."</TD><TD>".$row['Duedate']."</TD><TD>".$row['Returnedondate']."</TD></TR>";
 		}
 	}
+	
+	public static function viewLateRentals(){
+		$conn = DB::getConnection();
+		echo "<TR class='info'><TH>Copy ID</TH><TH>Username</TH><TH>Due Date</TH><TR>";
+		$result = mysqli_query($conn, "SELECT * from loanHistory where Groupnumber=10");
+		while($row = mysqli_fetch_array($result)){
+			if( strtotime($row['Duedate']) < strtotime('now') && strtotime('') == strtotime($row['Returnedondate'])) { 
+				echo "<TR><TD><B>".$row['Copyid']."<B></TD><TD>".$row['Username']."</TD><TD>".$row['Duedate']."</TD></TR>";
+			}
+		}
+	}
 
 	public static function createRentalRecord($userid, $copyid){
 		$conn = DB::getConnection();

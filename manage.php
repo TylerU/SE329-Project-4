@@ -59,6 +59,10 @@ $user = unserialize($_SESSION['user']);
 				<table id="historyTable" class="table table-condensed" style="background-color:#ffffff">
 					<TR class='info'><TH >Copy ID</TH><TH>Username</TH><TH >Due Date</TH><TH >Date Returned</TH><TR>
 				</table>
+				<h2 id="loanHeader">Late Rentals</h2>
+				<table id="lateTable" class="table table-condensed" style="background-color:#ffffff">
+					<TR class='info'><TH >Copy ID</TH><TH>Username</TH><TH >Due Date</TH><TR>
+				</table>
 			</div>
 		</div>
 	</div>
@@ -148,11 +152,22 @@ $('#returnBookBtn').click(function(){
 	$("#returnBookText").val("");
 });
 $(document).ready(function(){
+	
+	$.ajax({
+		type : "GET",
+		url	 : "router.php",
+		data : {"function" :"viewLates"},
+		success	: function(result){
+			$('#lateTable').html(result);
+		}
+	});
+	
 	checkOutTable();
 	if(<?php echo $user->isLib() ?>)
 		$(".teacher").css("display","");
 	else
 		$(".student").css("display","");
 	$('#deleteBookBtn').click(removeBook);
+	
 });
 </script>
