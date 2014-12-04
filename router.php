@@ -29,7 +29,7 @@ if(isset($_GET['function'])){
 	 	return;
 	}
 	if($function == 'checkoutBook'){
-		User::checkoutBook($_GET['userID'], $_GET['copyID']);
+		User::checkoutBook($_GET['userID'], $_GET['copyID'], $_GET['days']);
 		return;
 	}
 	if($function == 'returnBook'){

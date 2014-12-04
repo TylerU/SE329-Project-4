@@ -50,6 +50,8 @@ mail("andy.guibert@gmail.com",
 	      <div class="modal-body" align="center">
 	      </div>
 	      <div class="modal-footer">
+			<input type="radio" name="days" class="student" id="days_two" value="2">2 Day Rental<br>
+			<input type="radio" name="days" class="student" id="days_five" value="5" checked>5 Day Rental<br>
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 	        <button id="deleteBookBtn" type="button" class="btn btn-danger teacher" style="display:none" data-dismiss="modal">Delete</button>
 	        <button id="checkoutBookBtn" type="button" class="btn btn-primary student" style="display:none" data-dismiss="modal">Checkout</button>
@@ -90,7 +92,6 @@ function sendMail(){
 	});
 }
 function showModal(title, body, copyID){
-    	// $('#mymodal .modal-title').html(title);
     	$('#mymodal .modal-body').html(body);
     	$('#modal-copyid').val(copyID);
         $('#mymodal').modal('show');
@@ -197,10 +198,15 @@ $('#addBookBtn').click(function(){
 $('#checkoutBookBtn').click(function(){
 	var input = $("#modal-copyid").val();
 	var username = "<?php echo $user->getUsername() ?>";
+	var days;
+	if(document.getElementById('days_two').checked)
+		days = 2;
+	else
+		days = 5;
 	$.ajax({
 		type : "GET",
 		url  : "router.php",
-		data : {"function":"checkoutBook","copyID":input.trim(),"userID":username},
+		data : {"function":"checkoutBook","copyID":input.trim(),"userID":username,"days":days},
 		success : function(result){
 			if(result == 'FAILED')
 				alert("You have already checked out book " + input + " before.");

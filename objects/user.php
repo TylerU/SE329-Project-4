@@ -70,16 +70,16 @@ class User
 		}
 	}
 
-	public static function createRentalRecord($userid, $copyid){
+	public static function createRentalRecord($userid, $copyid, $days){
 		$conn = DB::getConnection();
 		$query = "INSERT INTO loanHistory (Groupnumber, Username, Copyid, Duedate) ".
-		    "VALUES (10, '".$userid."', ".$copyid.", DATE_ADD(CURDATE(), INTERVAL 5 DAY))";
+		    "VALUES (10, '".$userid."', ".$copyid.", DATE_ADD(CURDATE(), INTERVAL " . $days . " DAY))";
 		$result = mysqli_query($conn, $query);
 		return $result;
 	}
 
-	public static function checkoutBook($userid, $copyid){
-		$res = self::createRentalRecord($userid, $copyid);
+	public static function checkoutBook($userid, $copyid, $days){
+		$res = self::createRentalRecord($userid, $copyid, $days);
 		if($res)
 			Library::deleteCopyFromShelf($copyid);
 		else
