@@ -25,7 +25,7 @@ mail("andy.guibert@gmail.com",
 	    <ul class="nav navbar-nav">
 	    	<li><h4 class="navbar-text"><b>Unified Rental Service</b></h4>
 	    	<li class="active"><a href="#">Home</a></li>
-			<li><a href="manage.php">Account Management</a></li>
+			<li><a href="manage.php">Dashboard</a></li>
 		</ul>
 	    <ul class="nav navbar-nav navbar-right">
 			<li><button type="button" class="btn btn-danger navbar-btn" onclick="logout()">Logout <?php echo $user->getUsername() ?></button></li>

@@ -51,9 +51,7 @@ function validation(){
 
 		$user = User::createUser($uname,$passhash,$email,$phone,$bLib,$first,$last);
 		if($user != null){
-			$_SESSION['username'] = $user->getUsername();
-			$_SESSION['bIsLib']   = $user->isLib();
-			header("Location: home.php");
+			header("Location: register.php");
 		}
 		else{
 			echo "<script>alert('User: " .$uname. " already exists.')</script>";
