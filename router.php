@@ -84,5 +84,10 @@ if(isset($_GET['function'])){
 		User::hasRentalDueToday($userName);
 		return;
 	}	
+	if($function == 'checkRentalLate'){
+		$userName = $_GET['userID'];
+		User::hasLateRental($userName);
+		return;
+	}	
 }
 ?>

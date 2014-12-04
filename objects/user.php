@@ -62,9 +62,9 @@ class User
 	public static function viewLateRentals(){
 		$conn = DB::getConnection();
 		echo "<TR class='info'><TH>Copy ID</TH><TH>Username</TH><TH>Due Date</TH><TR>";
-		$result = mysqli_query($conn, "SELECT * from loanHistory where Groupnumber=10");
+		$result = mysqli_query($conn, "SELECT * from loanHistory where Groupnumber=10 and Returnedondate is NULL");
 		while($row = mysqli_fetch_array($result)){
-			if( strtotime($row['Duedate']) < strtotime('now') && strtotime('') == strtotime($row['Returnedondate'])) { 
+			if( strtotime($row['Duedate']) < strtotime('now')) { 
 				echo "<TR><TD><B>".$row['Copyid']."<B></TD><TD>".$row['Username']."</TD><TD>".$row['Duedate']."</TD></TR>";
 			}
 		}
@@ -193,6 +193,22 @@ class User
 			return;
 		}
 		echo "FAILED";
+		return;
+	}
+	
+	public static function hasLateRental($userName){
+		$conn = DB::getConnection();
+		if(!$userName){
+			return;
+		}
+		$result = mysqli_query($conn, "SELECT * FROM loanHistory where Groupnumber=10 and Username='".$userName."' and Returnedondate is NULL");
+		while($row = mysqli_fetch_array($result)){
+			if( strtotime($row['Duedate']) < strtotime('now')) { 
+				echo "LATE";
+				return;
+			}
+		}
+		echo "NONE";
 		return;
 	}
 }

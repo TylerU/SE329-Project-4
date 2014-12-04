@@ -79,6 +79,21 @@ function checkRentalDue(){
 		}
 	});
 }
+function checkRentalLate() {
+	if(<?php echo $user->isLib() ?>)
+		return;
+	var username = "<?php echo $user->getUsername() ?>";
+	$.ajax({
+		type : "GET",
+		url  : "router.php",
+		data : {"function":"checkRentalLate","userID":username},
+		success : function(result){
+			if(result == "LATE"){
+				alert("You have late rentals! Please check in Dashboard!");
+			}
+		}
+	});
+}
 function sendMail(){
 	var userEmail = "<?php echo $user->getEmail() ?>";
 	$.ajax({
@@ -224,6 +239,7 @@ $(document).ready(function(){
 		$(".student").css("display","");
 	$('#deleteBookBtn').click(removeBook);
 	checkRentalDue();
+	checkRentalLate();
 });
 </script>
 </html>
