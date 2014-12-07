@@ -11,57 +11,66 @@ if(isset($_GET['function'])){
 		Library::showLib();
 		return;
 	}
-	if($function === 'addBook'){
-		Library::addBook($_GET['title'], $_GET['author'], $_GET['qty']);
+	
+	if($function === 'addMovie'){
+		Library::addMovie($_GET['name'], $_GET['genre'], $_GET['date'], $_GET['qty']);
 		return;
 	}
-	if($function === 'removeBook'){
-		Library::deleteCopy($_GET['copyID']);
+	
+	if($function === 'removeMovie'){
+		Library::deleteMovie($_GET['name']);
 		return;
 	}
-	if($function == 'getBookInfo'){
-		$book = Library::getBook($_GET['copyID']);
-		echo "<h1 style='color:#333333'>".$book->getTitle()."</h1>".
-		     "<img src='images/".$book->getTitle().".jpg' alt='".$book->getTitle()."' border=10 style='width:500;'/>".
-			 "<BR><BR>Director:\t".$book->getAuthor().
-			 "<BR>Movie ID:\t".$book->getID().
-			 "<BR>Copy ID:\t".$book->getCopyID();
+	
+	if($function == 'getMovieInfo'){
+		$movie = Library::getMovie($_GET['title']);
+		echo "<h1 style='color:#333333'>".$movie->getTitle()."</h1>".
+		     "<img src='images/".$movie->getTitle().".jpg' alt='".$movie->getTitle()."' border=10 style='height:300px;'/>";
 	 	return;
 	}
-	if($function == 'checkoutBook'){
-		User::checkoutBook($_GET['userID'], $_GET['copyID'], $_GET['days']);
+	
+	if($function == 'checkoutMovie'){
+		User::checkoutMovie($_GET['userID'], $_GET['title'], $_GET['days']);
 		return;
 	}
-	if($function == 'returnBook'){
-		User::returnBook($_GET['userID'], $_GET['copyID']);
+	
+	if($function == 'returnMovie'){
+		User::returnMovie($_GET['userID'], $_GET['copyID']);
 		return;
 	}
+	
 	if($function == 'viewLoans'){
 		$userName = $_GET['user'];
 		$exact = $_GET['exact'];
 		User::viewLoanHistory($userName, $exact);
 		return;
 	}
+	
 	if($function == 'viewLates'){
 		User::viewLateRentals();
 		return;
 	}
+	
 	if($function == 'viewCheckOut'){
 		$userName = $_GET['userID'];
-		User::viewCheckedOutBook($userName);
+		User::viewCheckedOutMovie($userName);
 		return;
 	}
-	if($function == 'validate'){
-		$bookName = $_GET['bookName'];
-		$author   = $_GET['author'];
+	
+	if($function == 'validate') {
+		$bookName = $_GET['name'];
+		$genre   = $_GET['genre'];
 		$qty      = $_GET['qty'];
-		if(!ctype_digit($qty)){
-			echo "Invalid qty: " .$qty;
+		$date      = $_GET['date'];
+
+		if(!ctype_digit($qty)) {
+			echo "Invalid qty: " . $qty;
 			return;
 		}
 		echo "PASSED";
 		return;
 	}
+	
 	if($function == 'email'){
 		if(!isset($_SESSION['notified'])){
 			$userEmail = $_GET['userEmail'];

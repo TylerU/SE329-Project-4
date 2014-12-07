@@ -11,16 +11,36 @@ h1, h2, h3, h4, h5, a {
 	padding-bottom: 25px;
 	background-color: #4C4C4C;
 	border-radius: 25px;
+	overflow: auto;
+	clear: both;
+}
+
+.sub-header {
+	overflow: auto;
+}
+
+#search {
+	width: 100%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.sub-header h1 {
+	float: left;
+}
+
+.movie-div {
+	float: left;
+	padding: 10px;
+}
+
+.movie-div img {
+	width: 150px;
+	height: 200px;
 }
 @media only screen and (min-width:960px){
-    /* styles for browsers larger than 960px; */
-    img {
-		width:75px;
-	}
+
 }
 @media only screen and (min-width:1440px){
-    /* styles for browsers larger than 1440px; */
-    img {
-		width:115px;
-	}
+
 }

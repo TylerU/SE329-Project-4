@@ -5,24 +5,22 @@ class User
 {
 	private $_username;
 	private $_password;
+	private $_firstname;
+	private $_lastname;
 	private $_email;
-	private $_phone;
-	private $_bIsLib;
-	private $_first;
-	private $_last;
+	private $_admin;
 
-	public function __construct($user, $pass, $email, $phone, $bIsLib, $first, $last){
+	public function __construct($user, $pass, $firstname, $lastname, $email, $admin){
 		$this->_username = $user;
 		$this->_password = $pass;
-		$this->_email    = $email;
-		$this->_phone    = $phone;
-		$this->_bIsLib   = $bIsLib;
-		$this->_first    = $first;
-		$this->_last     = $last;
+		$this->_firstname = $firstname;
+		$this->_lastname = $lastname;
+		$this->_email = $email;
+		$this->_admin = $admin;
 	}
 
 	public function __sleep(){
-		return array('_username', '_email', '_phone', '_bIsLib', '_first', '_last');
+		return array('_username', '_email', '_firstname', '_lastname', '_admin');
 	}
 
 	public function __wakeup(){
@@ -31,95 +29,93 @@ class User
 	public function getUsername(){
 		return $this->_username;
 	}
-	public function isLib(){
-		return $this->_bIsLib;
-	}
-	public function getFirst(){
-		return $this->_first;
-	}
 
 	public function getEmail(){
 		return $this->_email;
 	}
 
+	public function isAdmin(){
+		return $this->_admin;
+	}
+
 	public static function viewLoanHistory($userName, $exact){
-		$conn = DB::getConnection();
 		echo "<TR class='info'><TH>Copy ID</TH><TH>Username</TH><TH>Due Date</TH><TH>Date Returned</TH><TR>";
 		if(!$userName){
 			return;
 		}
 		$result;
-		if($exact == "true"){
-			$result = mysqli_query($conn, "SELECT * from loanHistory where Groupnumber=10 and Username='".$userName."'");
-		}else{
-			$result = mysqli_query($conn, "SELECT * from loanHistory where Groupnumber=10 and Username LIKE '".$userName."%'");
+		if($exact == "true") {
+			$result = DB::query("SELECT * from rentals where username='".$userName."'");
+		} else {
+			$result = DB::query("SELECT * from rentals where username LIKE '".$userName."%'");
 		}
+
 		while($row = mysqli_fetch_array($result)){
-			echo "<TR><TD><B>".$row['Copyid']."<B></TD><TD>".$row['Username']."</TD><TD>".$row['Duedate']."</TD><TD>".$row['Returnedondate']."</TD></TR>";
+			echo "<TR><TD><B>".$row['id']."<B></TD><TD>".$row['username']."</TD><TD>".$row['duedate']."</TD><TD>".$row['checkedin']."</TD></TR>";
 		}
 	}
 	
-	public static function viewLateRentals(){
-		$conn = DB::getConnection();
-		echo "<TR class='info'><TH>Copy ID</TH><TH>Username</TH><TH>Due Date</TH><TR>";
-		$result = mysqli_query($conn, "SELECT * from loanHistory where Groupnumber=10 and Returnedondate is NULL");
-		while($row = mysqli_fetch_array($result)){
-			if( strtotime($row['Duedate']) < strtotime('now')) { 
-				echo "<TR><TD><B>".$row['Copyid']."<B></TD><TD>".$row['Username']."</TD><TD>".$row['Duedate']."</TD></TR>";
-			}
-		}
-	}
-
-	public static function createRentalRecord($userid, $copyid, $days){
-		$conn = DB::getConnection();
-		$query = "INSERT INTO loanHistory (Groupnumber, Username, Copyid, Duedate) ".
-		    "VALUES (10, '".$userid."', ".$copyid.", DATE_ADD(CURDATE(), INTERVAL " . $days . " DAY))";
-		$result = mysqli_query($conn, $query);
-		return $result;
-	}
-
-	public static function checkoutBook($userid, $copyid, $days){
-		$res = self::createRentalRecord($userid, $copyid, $days);
-		if($res)
-			Library::deleteCopyFromShelf($copyid);
-		else
-			echo "FAILED";
-	}
-
-	public static function viewCheckedOutBook($userName){
-		$conn = DB::getConnection();
+	public static function viewCheckedOutMovie($userName){
 		echo "<TR class='info'><TH>Copy ID</TH><TH>Due Date</TH></TR>";
 		if(!$userName){
 			return;
 		}
-		$result = mysqli_query($conn, "SELECT * FROM loanHistory where Groupnumber=10 and Username='".$userName."' and Returnedondate is NULL");
+		$result = DB::query("SELECT * FROM rentals where username='".$userName."' and checkedin is NULL");
 		while($row = mysqli_fetch_array($result)){
-			echo "<TR><TD><B>".$row['Copyid']."</B></TD><TD>".$row['Duedate']."</TD></TR>";
+			echo "<TR><TD><B>".$row['id']."</B></TD><TD>".$row['duedate']."</TD></TR>";
+		}
+	}
+	
+	public static function viewLateRentals(){
+		echo "<TR class='info'><TH>Copy ID</TH><TH>Username</TH><TH>Due Date</TH><TR>";
+		$result = DB::query("SELECT * from rentals where checkedin is NULL and duedate <= CURDATE()");
+		while($row = mysqli_fetch_array($result)){
+			echo "<TR><TD><B>".$row['id']."<B></TD><TD>".$row['username']."</TD><TD>".$row['duedate']."</TD></TR>";
 		}
 	}
 
-	public static function returnBook($userid, $copyid){
-		$conn = DB::getConnection();
+	public static function createRentalRecord($userid, $id, $days){
+		$query = "INSERT INTO rentals (username, id, checkedout, duedate) ".
+		    "VALUES ('" . $userid . "', " . $id . ", NOW(), DATE_ADD(CURDATE(), INTERVAL " . $days . " DAY))";
 
+		$result = DB::query($query);
+		return $result;
+	}
+
+	public static function checkoutMovie($userid, $title, $days) {
+		$result = DB::query("SELECT id from movieInstances where name = '" . $title . "' and id not in (select id from rentals where checkedin is null);"); 
+
+		if($row = mysqli_fetch_array($result)) {
+			$res = self::createRentalRecord($userid, $row["id"], $days);
+			if($res)
+				echo "PASSED";	
+			else
+				echo "FAILED";
+		}
+		else {
+			echo "FAILED";
+		}
+	}
+
+
+	public static function returnMovie($userid, $id){
 		// Update the loanHistory table
-		$query = "UPDATE loanHistory SET Returnedondate=CURDATE() ".
-			"WHERE Groupnumber=10 and Username='".$userid."' and Copyid=".$copyid;
-		$updateCount = mysqli_query($conn, $query);
+		$query = "UPDATE rentals SET checkedin=NOW() ".
+			"WHERE username='".$userid."' and id=".$id.";";
+
+		$updateCount = DB::query($query);
+
 		// TODO need to check for null result and avoid adding to shelf in that case
 		if($updateCount == false){
-			echo "Error: ". mysqli_error($conn);
+			echo "Error: ". mysqli_error(DB::getConnection());
 			return;
 		}
-		// Now put the book back on the shelf
-		Library::addCopyToShelf($copyid);
 	}
 
 	public static function doesUserExist($username){
 		$exists = false;
-		$conn = DB::getConnection();
+		$result = DB::query("SELECT * from users where username='". $username ."'");
 
-		$result = mysqli_query($conn, "SELECT * from users ".
-			"where Groupnumber=10 and username='". $username ."'");
 		if($row = mysqli_fetch_array($result))
 			$exists = true;
 
@@ -128,66 +124,59 @@ class User
 
 	public static function checkUserAndPass($username, $pass){
 		$success = false;
-		$conn = DB::getConnection();
-
-		$result = mysqli_query($conn, "SELECT * from users ".
-			"where Groupnumber=10 and username='". $username ."' and password='". md5($pass) ."'");
+		$result = DB::query("SELECT * from users where username='". $username ."' and password='". md5($pass) ."'");
 		if($row = mysqli_fetch_array($result))
 			$success = true;
 
 		return $success;
 	}
 
-	public static function isLibrarian($uname){
-		$conn = DB::getConnection();
-		$bLib;
+	public static function isUserAdmin($uname){
+		$admin;
 
-		$result = mysqli_query($conn, "SELECT Librarian from users ".
-			"where Groupnumber=10 and username='". $uname ."'");
+		$result = DB::query("SELECT admin from users where username='". $uname ."'");
 		if($row = mysqli_fetch_array($result))
-			$bLib = $row['Librarian'];
+			$admin = $row['admin'];
 
-		return $bLib;
+		return $admin;
 	}
 
-	public static function createUser($uname, $pwhash, $email, $phone, $isLib, $first, $last){
+	public static function createUser($uname, $pwhash, $first, $last, $email, $admin){
 		if(self::doesUserExist($uname)){
 			echo "User " . $uname . " already exists for group 10.<BR>";
 			return;
 		}
-		$conn = DB::getConnection();
-		// Group#, Username, password, email, phone, lib?, First, Last
-		mysqli_query($conn, "INSERT INTO users ".
-			"VALUES (10,'".$uname."','".$pwhash."','".$email."','".$phone."',".$isLib.",'".$first."','".$last."')");
 
-		return new User($uname, $pwhash, $email, $phone, $isLib, $first, $last);
+		DB::query("INSERT INTO users ".
+			"VALUES ('".$uname."','".$pwhash."','".$first."','".$last."','".$email."',".$admin.")");
+
+		return new User($uname, $pwhash, $first, $last, $email, $admin);
 	}
 
 	public static function getUser($uname){
 		$user = null;
-		$conn = DB::getConnection();
-		$result = mysqli_query($conn, "SELECT * FROM users ".
-			"where Groupnumber=10 and username='". $uname ."'");
+	
+		$result = DB::query("SELECT * FROM users ".
+			"where username='". $uname ."'");
+
 		if($row = mysqli_fetch_array($result)){
-			$user   = $row['Username'];
-			$pass   = $row['Password'];
-			$email  = $row['Email'];
-			$phone  = $row['Phone'];
-			$bIsLib = $row['Librarian'];
-			$first  = $row['Firstname'];
-			$last   = $row['Lastname'];
-			$user = new User($user, $pass, $email, $phone, $bIsLib, $first, $last); 
+			$user   = $row['username'];
+			$pass   = $row['password'];
+			$email  = $row['email'];
+			$admin  = $row['admin'];
+			$first  = $row['firstname'];
+			$last   = $row['lastname'];
+			$user = new User($user, $pass, $first, $last, $email, $admin); 
 		}
 
 		return $user;
 	}
 
 	public static function hasRentalDueToday($userName){
-		$conn = DB::getConnection();
 		if(!$userName){
 			return;
 		}
-		$result = mysqli_query($conn, "SELECT * FROM loanHistory where Groupnumber=10 and Duedate=CURDATE() and Username='".$userName."' and Returnedondate is NULL");
+		$result = DB::query("SELECT * FROM rentals where duedate=CURDATE() and username='".$userName."' and checkedin is NULL");
 		while($row = mysqli_fetch_array($result)){
 			echo "PASSED";
 			return;
@@ -197,16 +186,13 @@ class User
 	}
 	
 	public static function hasLateRental($userName){
-		$conn = DB::getConnection();
 		if(!$userName){
 			return;
 		}
-		$result = mysqli_query($conn, "SELECT * FROM loanHistory where Groupnumber=10 and Username='".$userName."' and Returnedondate is NULL");
+		$result = DB::query("SELECT * FROM rentals where username='" . $userName . "' and checkedin is NULL and duedate <= CURDATE() ");
 		while($row = mysqli_fetch_array($result)){
-			if( strtotime($row['Duedate']) < strtotime('now')) { 
-				echo "LATE";
-				return;
-			}
+			echo "LATE";
+			return;
 		}
 		echo "NONE";
 		return;

@@ -6,11 +6,10 @@ require_once('shelf.php');
 class Book
 {
 	private $_title;
-	private $_author;
 	private $_copyID;
 	private $_bookID;
 
-	function __construct($title, $author, $copyID, $bookID){
+	function __construct($title, $copyID, $bookID){
 		$this->_title  = $title;
 		$this->_author = $author;
 		$this->_copyID = $copyID;

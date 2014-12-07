@@ -46,7 +46,8 @@ $user = unserialize($_SESSION['user']);
 			<div class="col-md-3">
 				<h3><u>Add a Movie</u></h3>
 				<input id="addBookName" name="addBookName" type="text" placeholder="MovieName"> <br>
-				<input id="addAuthor" name="addAuthor" type="text" placeholder="Director"><br>
+				<input id="addGenre" name="addGenre" type="text" placeholder="Genre"><br>
+				<input id="addDate" name="addDate" type="text" placeholder="Release Date"><br>
 				<input id="addQty" name="addQty" type="text" placeholder="Qty"><br><br>
 				<button id="addBookBtn" type="submit" value="addBook" class="btn btn-success">Add a Movie</button>
 				<hr>
@@ -108,35 +109,53 @@ $('#viewUserHistory').keyup(function() {
 	});
 });
 $('#addBookBtn').click(function(){
-	var bookName = $("#addBookName").val();
-	var author 	 = $("#addAuthor").val();
+	var name = $("#addBookName").val();
+	var genre 	 = $("#addGenre").val();
 	var qty      = $("#addQty").val();
+	var date      = $("#addDate").val();
 	var validated = false;
+
 	$.ajax({
 		type : "GET",
 		url  : "router.php",
-		data : {"function":"validate","bookName":bookName,"author":author,"qty":qty},
+		data : {
+			"function":"validate",
+			"name":name,
+			"genre":genre,
+			"date":date,
+			"qty":qty
+		},
 		async:   false,
 		success : function(result){
-			if(result == "PASSED")
+			if(result.trim() == "PASSED")
 				validated = true;
 			else
 				alert(result);
 		}
-	})
+	});
+
 	if(!validated)
 		return;
+
 	$.ajax({
 		type : "GET",
 		url  : "router.php",
-		data : {"function":"addBook","title":bookName,"author":author,"qty":qty},
+		data : {
+			"function":"addMovie",
+			"name":name,
+			"genre":genre,
+			"date":date,
+			"qty":qty
+		},
 		success : function(result){
 			updateLib();
 		}
 	});
+	
 	$("#addBookName").val("");
-	$("#addAuthor").val("");
+	$("#addGenre").val("");
 	$("#addQty").val("");
+	$("#addDate").val("");
 });
 $('#returnBookBtn').click(function(){
 	var input = $("#returnBookText").val();
@@ -144,7 +163,7 @@ $('#returnBookBtn').click(function(){
 	$.ajax({
 		type : "GET",
 		url  : "router.php",
-		data : {"function":"returnBook","copyID":input.trim(),"userID":username},
+		data : {"function":"returnMovie","copyID":input.trim(),"userID":username},
 		success : function(result){
 			checkOutTable();
 		}
@@ -163,7 +182,7 @@ $(document).ready(function(){
 	});
 	
 	checkOutTable();
-	if(<?php echo $user->isLib() ?>)
+	if(<?php echo $user->isAdmin() ?>)
 		$(".teacher").css("display","");
 	else
 		$(".student").css("display","");

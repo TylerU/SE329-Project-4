@@ -6,6 +6,12 @@ $dbPassword = "024IjLaMj4dI";
 $dbServer = "mysql.cs.iastate.edu"; 
 $dbName   = "db319all";
 
+// Local version
+$dbUsername = "root";
+$dbPassword = "";
+$dbServer = "localhost"; 
+$dbName   = "329proj4";
+
 class DB
 {
 	static $conn = null;
@@ -29,26 +35,8 @@ class DB
 		$result = mysqli_query($conn, $queryStr);
 		return $result;
 	}
-
-	function showTable(){
-		$conn = self::getConnection();
-
-		$result = mysqli_query($conn, "SELECT * FROM users where Groupnumber=10");
-
-		while($row = mysqli_fetch_array($result)){
-			echo $row['Groupnumber']." ".$row['Username']." ";
-			echo $row['Password']." ".$row['Email']." ".$row['Phone']." ";
-			echo $row['Librarian']." ".$row['Firstname'] . " " . $row['Lastname'] . "<BR>";
-		}
-	}
-
-	function createShelves(){
-		$conn = self::getConnection();
-		for($i = 0; $i < 10; $i++){
-			for($j = 0; $j < 10; $j++){
-				mysqli_query($conn, "INSERT INTO shelves VALUES (10, ". $i .", -1)");
-			}
-		}
-	}
 }
+
 ?>
+
+

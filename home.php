@@ -1,13 +1,9 @@
 <?php
 require_once('objects/user.php');
-require_once('objects/book.php');
+require_once('objects/movie.php');
 require_once('objects/library.php');
 session_start();
 $user = unserialize($_SESSION['user']);
-
-mail("andy.guibert@gmail.com",
-	'[Unified Rental Service] Upcoming rental deadline',
-	'One of your rentals is due today, make sure you bring that back to us!');
 ?>
 
 <html>
@@ -33,14 +29,30 @@ mail("andy.guibert@gmail.com",
 		</ul>
 		</div>
 	</nav>
-	<div class="col-md-offset-1">
-		<div >
-			<h1 style="">Unified Rental Service</h1>
-			<div class="col-md-10 urs-container" style="padding-left:25px">
-				<table id="lib" class="table">
-				</table>
+	<div class="container">
+			<div class="row sub-header">
+				<div  class="col-md-9"><h1>Unified Rental Service</h1></div>
+				<div class="col-md-3">
+					<input id="search" type="text" placeholder="search"/>
+					Sort By:
+					<select id="sort">
+					  <option value="alpha">ABC</option>
+					  <option value="rating">Rating</option>
+					  <option value="date">Release Date</option>
+					</select>
+					<br>
+					Genre Filter:
+					<select id="genreChange" style="margin-top:10px;margin-bottom:10px">
+					<?php
+						Library::getGenreOptions();
+					?>
+					</select>
+				</div>
 			</div>
-		</div>
+			<div class="urs-container" style="padding-left:25px">
+				<div id="lib" class="table">
+				</div>
+			</div>
 	</div>
 	<!-- Modal for when a table cell is clicked -->
 	<div id="mymodal" class="modal fade">
@@ -65,7 +77,7 @@ function logout(){
 	window.location.href = "index.php";
 }
 function checkRentalDue(){
-	if(<?php echo $user->isLib() ?>)
+	if(<?php echo $user->isAdmin() ?>)
 		return;
 	var username = "<?php echo $user->getUsername() ?>";
 	$.ajax({
@@ -80,7 +92,7 @@ function checkRentalDue(){
 	});
 }
 function checkRentalLate() {
-	if(<?php echo $user->isLib() ?>)
+	if(<?php echo $user->isAdmin() ?>)
 		return;
 	var username = "<?php echo $user->getUsername() ?>";
 	$.ajax({
@@ -111,13 +123,13 @@ function showModal(title, body, copyID){
     	$('#modal-copyid').val(copyID);
         $('#mymodal').modal('show');
 }
-function getBookInfo(copyID){
+function getMovieInfo(title){
 	$.ajax({
 		type  : "GET",
 		url   : "router.php",
-		data  : {"function": "getBookInfo","copyID": copyID},
+		data  : {"function": "getMovieInfo","title": title},
 		success: function(result){
-			showModal("Information for Movie " + copyID, result, copyID);
+			showModal("Information for Movie " + title, result, title);
 		}
 	});
 }
@@ -128,8 +140,8 @@ function updateLib(){
 		data : {"function":"showLib"},
 		success : function(result){
 			$("#lib").html(result);
-			$('.book').click(function(){
-				getBookInfo($(this).find("input").val());
+			$('.movie-div').click(function(){
+				getMovieInfo($(this).find("input").val());
 			})
 		} 
 	});
@@ -139,23 +151,25 @@ function removeBook(){
 	$.ajax({
 		type : "GET",
 		url  : "router.php",
-		data : {"function":"removeBook","copyID":input.trim()},
+		data : {"function":"removeMovie","name":input.trim()},
 		success : function(result){
 			updateLib();
 		}
 	});
 }
+
 function checkOutTable(){
 	var username = "<?php echo $user->getUsername() ?>";
 	$.ajax({
-		type : "GET",
-		url	 : "router.php",
-		data : {"function" :"viewCheckOut", "userID"	:username},
+		type: "GET", 
+		url: "router.php",
+		data: {"function" :"viewCheckOut", "userID":username},
 		success	: function(result){
 			$('#checkOutTable').html(result);
 		}
 	});
 }
+
 $('#viewLoansBtn').click(function(){
 	var input = $('#viewUserHistory').val();
 	$.ajax({
@@ -210,7 +224,7 @@ $('#addBookBtn').click(function(){
 	$("#addAuthor").val("");
 	$("#addQty").val("");
 });
-$('#checkoutBookBtn').click(function(){
+$('#checkoutBookBtn').click(function() {
 	var input = $("#modal-copyid").val();
 	var username = "<?php echo $user->getUsername() ?>";
 	var days;
@@ -218,11 +232,12 @@ $('#checkoutBookBtn').click(function(){
 		days = 2;
 	else
 		days = 5;
+
 	$.ajax({
 		type : "GET",
 		url  : "router.php",
-		data : {"function":"checkoutBook","copyID":input.trim(),"userID":username,"days":days},
-		success : function(result){
+		data : {"function":"checkoutMovie", "title": input.trim(), "userID":username, "days":days},
+		success : function(result) {
 			if(result == 'FAILED')
 				alert("You have already checked out book " + input + " before.");
 			updateLib();
@@ -233,7 +248,7 @@ $('#checkoutBookBtn').click(function(){
 $(document).ready(function(){
 	updateLib();
 	checkOutTable();
-	if(<?php echo $user->isLib() ?>)
+	if(<?php echo $user->isAdmin() ?>)
 		$(".teacher").css("display","");
 	else
 		$(".student").css("display","");
