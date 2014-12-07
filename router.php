@@ -33,7 +33,17 @@ if(isset($_GET['function'])){
 		User::checkoutMovie($_GET['userID'], $_GET['title'], $_GET['days']);
 		return;
 	}
-	
+	if($function == 'updateRating'){
+		$movie = Library::getBook($_GET['copyID']);
+		$movie->updateRating($_GET['userRating']);
+		return;
+	}
+	if($function == 'getRating'){
+		$movie = Library::getBook($_GET['copyID']);
+		$movie->getRating();
+		return;
+	}
+
 	if($function == 'returnMovie'){
 		User::returnMovie($_GET['userID'], $_GET['copyID']);
 		return;

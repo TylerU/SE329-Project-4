@@ -62,11 +62,33 @@ $user = unserialize($_SESSION['user']);
 	      <div class="modal-body" align="center">
 	      </div>
 	      <div class="modal-footer">
-			<input type="radio" name="days" class="student" id="days_two" value="2">2 Day Rental<br>
-			<input type="radio" name="days" class="student" id="days_five" value="5" checked>5 Day Rental<br>
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-	        <button id="deleteBookBtn" type="button" class="btn btn-danger teacher" style="display:none" data-dismiss="modal">Delete</button>
-	        <button id="checkoutBookBtn" type="button" class="btn btn-primary student" style="display:none" data-dismiss="modal">Checkout</button>
+            <div class="row">
+    	      	<div class="col-md-7">
+                    <div class="progress">
+                        <div id="rating-bar" class="progress-bar progress-bar-warning" style="width: 100%; min-width: 0px;">
+                            
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <button id="rating-button" class="btn btn-default" type="button">Rate</button>
+                            </div>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>out of 5</h6>
+                    </div>
+    	      	</div>
+    	      	<div class="col-md-5">
+    				<input type="radio" name="days" class="student" id="days_two" value="2">2 Day Rental<br>
+    				<input type="radio" name="days" class="student" id="days_five" value="5" checked>5 Day Rental<br>
+    		        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+    		        <button id="deleteBookBtn" type="button" class="btn btn-danger teacher" style="display:none" data-dismiss="modal">Delete</button>
+    		        <button id="checkoutBookBtn" type="button" class="btn btn-primary student" style="display:none" data-dismiss="modal">Checkout</button>
+    	        </div>
+            </div>
 	      </div>
 	    </div><!-- /.modal-content -->
 	  </div><!-- /.modal-dialog -->
@@ -75,6 +97,28 @@ $user = unserialize($_SESSION['user']);
 <script>
 function logout(){
 	window.location.href = "index.php";
+}
+function updateRating(userRating){
+    var copyID = $('#modal-copyid').val();
+    $.ajax({
+        type    :"GET",
+        url     :"router.php",
+        data    :{"function":"updateRating","copyID":copyID,"userRating":userRating},
+        success :function(result){
+            getRating(copyID);
+        }
+    });
+}
+function getRating(title){
+    $.ajax({
+        type    :"GET",
+        url     :"router.php",
+        data    :{"function":"getRating","name":title},
+        success :function(result){
+            $('#rating-bar').css("width", result)
+            $('#rating-bar').html(result);
+        }
+    });
 }
 function checkRentalDue(){
 	if(<?php echo $user->isAdmin() ?>)
@@ -130,6 +174,7 @@ function getMovieInfo(title){
 		data  : {"function": "getMovieInfo","title": title},
 		success: function(result){
 			showModal("Information for Movie " + title, result, title);
+            getRating(title);
 		}
 	});
 }
@@ -244,6 +289,9 @@ $('#checkoutBookBtn').click(function() {
 			checkOutTable();
 		}
 	});
+});
+$('#rating-button').click(function(){
+    updateRating();
 });
 $(document).ready(function(){
 	updateLib();
