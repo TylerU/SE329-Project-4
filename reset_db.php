@@ -14,13 +14,13 @@ DB::query("create table rentals (username char (20) references users, id int not
 DB::query("insert into users values ('joe','" . md5("joe") . "', 'Joe', 'Miller', 'joe@joe.com', FALSE);");
 DB::query("insert into users values ('tyler','" . md5("tyler") . "', 'Tyler', 'Miller', 'tyler@tyler.com', TRUE);");
 
-DB::query("insert into movies values ('Transformers', 3, CURDATE(), 'Action');");
-DB::query("insert into movies values ('Frozen', 5, CURDATE(), 'Family');");
-DB::query("insert into movies values ('Dracula', 5, CURDATE(), 'Action');");
-DB::query("insert into movies values ('Fury', 5, CURDATE(), 'History');");
-DB::query("insert into movies values ('Interstellar', 5, CURDATE(), 'Adventure');");
-DB::query("insert into movies values ('Thor', 5, CURDATE(), 'Action');");
-DB::query("insert into movies values ('The Hobbit', 5, CURDATE(), 'Adventure');");
+DB::query("insert into movies values ('Transformers', 1, DATE_ADD(CURDATE(), INTERVAL -7 DAY), 'Action');");
+DB::query("insert into movies values ('Frozen', 1, DATE_ADD(CURDATE(), INTERVAL -6 DAY), 'Family');");
+DB::query("insert into movies values ('Dracula', 2, DATE_ADD(CURDATE(), INTERVAL -5 DAY), 'Action');");
+DB::query("insert into movies values ('Fury', 3, DATE_ADD(CURDATE(), INTERVAL -4 DAY), 'History');");
+DB::query("insert into movies values ('Interstellar', 5, DATE_ADD(CURDATE(), INTERVAL -3 DAY), 'Adventure');");
+DB::query("insert into movies values ('Thor', 5, DATE_ADD(CURDATE(), INTERVAL -2 DAY), 'Action');");
+DB::query("insert into movies values ('The Hobbit', 5, DATE_ADD(CURDATE(), INTERVAL -1 DAY), 'Adventure');");
 
 DB::query("insert into movieInstances values ('Transformers', 0);");
 DB::query("insert into movieInstances values ('Transformers', 1);");

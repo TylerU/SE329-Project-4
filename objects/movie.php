@@ -4,23 +4,17 @@ require_once('dbutil.php');
 class Movie
 {
 	private $_title;
-	private $_id;
 	private $_rating;
 	private $_release;
 
 	function __construct($title, $rating, $release){
 		$this->_title  = $title;
-		// $this->_id = $id;
 		$this->_rating = $rating;
 		$this->_release = $release;
 	}	
 
 	public function getTitle(){
 		return $this->_title;
-	}
-
-	public function getID(){
-		// return $this->_id;
 	}
 
 	public function getRating() {
@@ -41,6 +35,15 @@ class Movie
 		$rating = $row['rating'];
 		$movie = new Movie($title, $rating, $release);
 		return $movie;
+	}
+
+	public function updateRating($userRating){
+		#TODO make update to DB here using the new userRating value;
+		DB::query("Update movies set rating = " . $userRating . " where name = '" . $this->_title . "'");
+	}
+
+	public function getRatingStr(){
+		echo ($this->_rating / 5.0 * 100) . "%";
 	}
 }
 ?>

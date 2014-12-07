@@ -4,8 +4,25 @@ require_once('movie.php');
 
 class Library
 {
-	public static function showLib(){
-		$query = "SELECT * from movies where name in (SELECT name from movieInstances where id not in (select id from rentals where checkedin is null))";
+	public static function showLib($search, $sort, $genre){
+		$search = trim($search);
+		$searchStr = "name like '%" . $search . "%' and ";
+		if(strlen($search) == 0) {
+			$searchStr = '';
+		}
+
+		$sortStr = $sort;
+		if($sortStr === "rating") {
+			$sortStr = $sortStr . " DESC";
+		}
+
+		$genreStr = "genre = '" .$genre. "' and ";
+		if($genre == "All") {
+			$genreStr = "";
+		}
+
+		$query = "SELECT * from movies where " . $genreStr . $searchStr . "name in (SELECT name from movieInstances where id not in (select id from rentals where checkedin is null)) ORDER BY " . $sortStr;
+
 		$result = DB::query($query);
 		$movies = Library::getMovies($result);
 		Library::showMovieList($movies);
@@ -50,6 +67,7 @@ class Library
         	"SELECT DISTINCT genre from movies"
         );
 
+		echo "<option value='"."All"."'>"."All"."</option>";
         while($row = mysqli_fetch_array($result)) {
         	echo "<option value='".$row["genre"]."'>".$row["genre"]."</option>";
         }

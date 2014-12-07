@@ -8,7 +8,11 @@ if(isset($_GET['function'])){
 	$function = $_GET['function'];
 
 	if($function === 'showLib'){
-		Library::showLib();
+		$search = $_GET['search'];
+		$sort = $_GET['sort'];
+		$genre = $_GET['genre'];
+
+		Library::showLib($search, $sort, $genre);
 		return;
 	}
 	
@@ -34,13 +38,13 @@ if(isset($_GET['function'])){
 		return;
 	}
 	if($function == 'updateRating'){
-		$movie = Library::getBook($_GET['copyID']);
+		$movie = Library::getMovie($_GET['title']);
 		$movie->updateRating($_GET['userRating']);
 		return;
 	}
 	if($function == 'getRating'){
-		$movie = Library::getBook($_GET['copyID']);
-		$movie->getRating();
+		$movie = Library::getMovie($_GET['title']);
+		$movie->getRatingStr();
 		return;
 	}
 

@@ -36,9 +36,9 @@ $user = unserialize($_SESSION['user']);
 					<input id="search" type="text" placeholder="search"/>
 					Sort By:
 					<select id="sort">
-					  <option value="alpha">ABC</option>
+					  <option value="name">ABC</option>
 					  <option value="rating">Rating</option>
-					  <option value="date">Release Date</option>
+					  <option value="releasedate">Release Date</option>
 					</select>
 					<br>
 					Genre Filter:
@@ -74,7 +74,7 @@ $user = unserialize($_SESSION['user']);
                             <div class="input-group-btn">
                                 <button id="rating-button" class="btn btn-default" type="button">Rate</button>
                             </div>
-                            <input type="text" class="form-control">
+                            <input type="text" id="userRating" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -103,9 +103,10 @@ function updateRating(userRating){
     $.ajax({
         type    :"GET",
         url     :"router.php",
-        data    :{"function":"updateRating","copyID":copyID,"userRating":userRating},
+        data    :{"function":"updateRating","title":copyID,"userRating":userRating},
         success :function(result){
             getRating(copyID);
+            updateLib();
         }
     });
 }
@@ -113,7 +114,7 @@ function getRating(title){
     $.ajax({
         type    :"GET",
         url     :"router.php",
-        data    :{"function":"getRating","name":title},
+        data    :{"function":"getRating","title":title},
         success :function(result){
             $('#rating-bar').css("width", result)
             $('#rating-bar').html(result);
@@ -150,6 +151,7 @@ function checkRentalLate() {
 		}
 	});
 }
+
 function sendMail(){
 	var userEmail = "<?php echo $user->getEmail() ?>";
 	$.ajax({
@@ -162,11 +164,13 @@ function sendMail(){
 		}
 	});
 }
+
 function showModal(title, body, copyID){
     	$('#mymodal .modal-body').html(body);
     	$('#modal-copyid').val(copyID);
         $('#mymodal').modal('show');
 }
+
 function getMovieInfo(title){
 	$.ajax({
 		type  : "GET",
@@ -179,16 +183,24 @@ function getMovieInfo(title){
 	});
 }
 function updateLib(){
+	var input = $('#search').val();
+	var sort = $('#sort').val();
+	var genre = $('#genreChange').val();
 	$.ajax({
 		type : "GET",
-		url  : "router.php",
-		data : {"function":"showLib"},
-		success : function(result){
+		url	 : "router.php",
+		data : {
+			"function" : "showLib", 
+			"search":input,  
+			"sort": sort,
+			"genre": genre,
+		},
+		success	: function(result){
 			$("#lib").html(result);
 			$('.movie-div').click(function(){
 				getMovieInfo($(this).find("input").val());
 			})
-		} 
+		}
 	});
 };
 function removeBook(){
@@ -214,6 +226,10 @@ function checkOutTable(){
 		}
 	});
 }
+
+$('#search').keyup(updateLib);
+$('#sort').change(updateLib);
+$('#genreChange').change(updateLib);
 
 $('#viewLoansBtn').click(function(){
 	var input = $('#viewUserHistory').val();
@@ -291,7 +307,7 @@ $('#checkoutBookBtn').click(function() {
 	});
 });
 $('#rating-button').click(function(){
-    updateRating();
+    updateRating($("#userRating").val());
 });
 $(document).ready(function(){
 	updateLib();
@@ -306,3 +322,4 @@ $(document).ready(function(){
 });
 </script>
 </html>
+
