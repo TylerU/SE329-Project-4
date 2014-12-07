@@ -28,6 +28,16 @@ if(isset($_GET['function'])){
 			 "<BR>Copy ID:\t".$book->getCopyID();
 	 	return;
 	}
+	if($function == 'updateRating'){
+		$movie = Library::getBook($_GET['copyID']);
+		$movie->updateRating($_GET['userRating']);
+		return;
+	}
+	if($function == 'getRating'){
+		$movie = Library::getBook($_GET['copyID']);
+		$movie->getRating();
+		return;
+	}
 	if($function == 'checkoutBook'){
 		User::checkoutBook($_GET['userID'], $_GET['copyID'], $_GET['days']);
 		return;

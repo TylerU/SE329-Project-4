@@ -83,5 +83,16 @@ class Book
 
 		return $book;
 	}
+
+	public static function updateRating($userRating){
+		#TODO make update to DB here using the new userRating value;
+	}
+
+	public static function getRating(){
+		#TODO make SQL query using '$this->_bookID' to pull ratings from ratings table and echo result to js
+		#Below is sample static ouput from this function.
+		echo "60%";
+
+	}
 }
 ?>
