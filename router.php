@@ -29,7 +29,9 @@ if(isset($_GET['function'])){
 	if($function == 'getMovieInfo'){
 		$movie = Library::getMovie($_GET['title']);
 		echo "<h1 style='color:#333333'>".$movie->getTitle()."</h1>".
-		     "<img src='images/".$movie->getTitle().".jpg' alt='".$movie->getTitle()."' border=10 style='height:300px;'/>";
+		     "<img src='images/".$movie->getTitle().".jpg' alt='".$movie->getTitle()."' border=10 style='height:300px;'/>" .
+		     "<div> Genre: " . $movie->getGenre() . "</div>". 
+			 "<div> Release Date: " . $movie->getReleaseDate() . "</div>";
 	 	return;
 	}
 	

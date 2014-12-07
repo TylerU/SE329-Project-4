@@ -6,11 +6,13 @@ class Movie
 	private $_title;
 	private $_rating;
 	private $_release;
+	private $_genre;
 
-	function __construct($title, $rating, $release){
+	function __construct($title, $rating, $release, $genre){
 		$this->_title  = $title;
 		$this->_rating = $rating;
 		$this->_release = $release;
+		$this->_genre = $genre;
 	}	
 
 	public function getTitle(){
@@ -21,6 +23,13 @@ class Movie
 		return $this->_rating;
 	}
 
+	public function getGenre() {
+		return $this->_genre;
+	}
+
+	public function getReleaseDate() {
+		return $this->_release;
+	}
 	public static function getNextId(){
 		$result = DB::query("SELECT MAX(id) as id FROM movieInstances");
 		$row = mysqli_fetch_array($result);
@@ -33,7 +42,8 @@ class Movie
 		$title  = $row['name'];
 		$release = $row['releasedate'];
 		$rating = $row['rating'];
-		$movie = new Movie($title, $rating, $release);
+		$genre = $row['genre'];
+		$movie = new Movie($title, $rating, $release, $genre);
 		return $movie;
 	}
 
