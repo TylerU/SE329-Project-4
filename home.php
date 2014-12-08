@@ -120,7 +120,7 @@ function getRating(title){
             $('#rating-bar').html(result);
         }
     });
-}
+} 
 function checkRentalDue(){
 	if(<?php echo $user->isAdmin() ?>)
 		return;
@@ -130,7 +130,7 @@ function checkRentalDue(){
 		url  : "router.php",
 		data : {"function":"checkDueToday","userID":username},
 		success : function(result){
-			if(result == "PASSED"){
+			if(result.trim() == "PASSED"){
 				sendMail();
 			}
 		}
@@ -145,7 +145,7 @@ function checkRentalLate() {
 		url  : "router.php",
 		data : {"function":"checkRentalLate","userID":username},
 		success : function(result){
-			if(result == "LATE"){
+			if(result.trim() == "LATE"){
 				alert("You have late rentals! Please check in Dashboard!");
 			}
 		}
@@ -159,7 +159,7 @@ function sendMail(){
 		url  : "router.php",
 		data : {"function":"email","userEmail":userEmail},
 		success : function(result){
-			if(result != "")
+			if(result.trim() != "")
 				alert(result);
 		}
 	});
