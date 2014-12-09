@@ -67,7 +67,7 @@ class User
 	}
 	
 	public static function viewLateRentals(){
-		echo "<TR class='info'><TH>Copy ID</TH><TH>Username</TH><TH>Due Date</TH><TR>";
+		echo "<TR class='info'><TH>Copy ID</TH><TH>Username</TH><TH>Due Date</TH></TR>";
 		$result = DB::query("SELECT * from rentals where checkedin is NULL and duedate <= CURDATE()");
 		while($row = mysqli_fetch_array($result)){
 			echo "<TR><TD><B>".$row['id']."<B></TD><TD>".$row['username']."</TD><TD>".$row['duedate']."</TD></TR>";
